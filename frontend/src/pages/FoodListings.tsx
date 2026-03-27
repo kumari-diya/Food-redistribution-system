@@ -40,55 +40,71 @@ const listings = [
     location: 'Northside Dairy',
     expiry: '24 hours remaining',
     donor: 'Fresh Farm',
-    image: 'https://images.unsplash.com/photo-1550583724-125581cc255b?q=80&w=1974&auto=format&fit=crop',
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSeGmivs2rrFir-fyjUJrRQXjOeFydVgL_RCA&s",
     category: 'Dairy',
   },
 ];
 
 const FoodListings = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedItem, setSelectedItem] = useState(null);
   const [activeCategory, setActiveCategory] = useState('All');
+  const [showPopup, setShowPopup] = useState(false);
 
   const categories = ['All', 'Hot Food', 'Produce', 'Bakery', 'Dairy'];
 
-  const filteredListings = listings.filter(item => 
+  const filteredListings = listings.filter(item =>
     (activeCategory === 'All' || item.category === activeCategory) &&
-    (item.type.toLowerCase().includes(searchTerm.toLowerCase()) || item.location.toLowerCase().includes(searchTerm.toLowerCase()))
+    (item.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.location.toLowerCase().includes(searchTerm.toLowerCase()))
   );
+
+  const handleConfirmRequest = () => {
+    setSelectedItem(null);
+    setShowPopup(true);
+
+    setTimeout(() => {
+      setShowPopup(false);
+    }, 3000);
+  };
 
   return (
     <div className="bg-gray-50 min-h-screen pb-20">
+
       {/* Header */}
-      <div className="bg-white border-b border-gray-100 pt-10 pb-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">Available Food Donations</h1>
-          
+      <div className="bg-white border-b pt-10 pb-16">
+        <div className="max-w-7xl mx-auto px-4">
+          <h1 className="text-3xl font-bold mb-6">Available Food Donations</h1>
+
+          {/* Search */}
           <div className="flex flex-col md:flex-row gap-4">
             <div className="relative flex-grow">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search by food type or location..."
-                className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all"
+                placeholder="Search by food or location..."
+                className="w-full pl-12 pr-4 py-3 rounded-2xl border"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <button className="flex items-center justify-center gap-2 px-6 py-3.5 bg-white border border-gray-200 rounded-2xl font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
+
+            <button className="flex items-center gap-2 px-6 py-3 border rounded-2xl">
               <Filter className="h-5 w-5" />
               Filters
             </button>
           </div>
 
-          <div className="flex gap-2 mt-8 overflow-x-auto pb-2 no-scrollbar">
-            {categories.map((cat) => (
+          {/* Categories */}
+          <div className="flex gap-2 mt-6 overflow-x-auto">
+            {categories.map(cat => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-6 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all ${
+                className={`px-5 py-2 rounded-full text-sm font-bold ${
                   activeCategory === cat
-                    ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-100'
-                    : 'bg-white text-gray-600 border border-gray-100 hover:border-emerald-200'
+                    ? 'bg-emerald-600 text-white'
+                    : 'bg-white border'
                 }`}
               >
                 {cat}
@@ -98,75 +114,78 @@ const FoodListings = () => {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredListings.map((item) => (
-            <motion.div
-              layout
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              key={item.id}
-              className="bg-white rounded-[32px] overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-gray-200/40 transition-all group"
-            >
-              <div className="relative h-56">
-                <img src={item.image} alt={item.type} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                <div className="absolute top-4 left-4">
-                  <span className="bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-xl text-xs font-bold text-emerald-700 border border-emerald-100 shadow-sm">
-                    {item.category}
-                  </span>
-                </div>
-              </div>
-              <div className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-1">{item.type}</h3>
-                    <p className="text-sm text-gray-500 flex items-center gap-1">
-                      by <span className="font-semibold text-emerald-600">{item.donor}</span>
-                    </p>
-                  </div>
-                </div>
+      {/* Cards */}
+      <div className="max-w-7xl mx-auto px-4 mt-10 grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {filteredListings.map(item => (
+          <motion.div
+            key={item.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-3xl overflow-hidden shadow hover:shadow-xl"
+          >
+            <img src={item.image} alt={item.type} className="h-52 w-full object-cover" />
 
-                <div className="space-y-3 mb-8">
-                  <div className="flex items-center gap-3 text-gray-600">
-                    <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center">
-                      <Package className="h-4 w-4 text-emerald-600" />
-                    </div>
-                    <span className="text-sm font-medium">{item.quantity}</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-gray-600">
-                    <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center">
-                      <MapPin className="h-4 w-4 text-emerald-600" />
-                    </div>
-                    <span className="text-sm font-medium">{item.location}</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-gray-600">
-                    <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center">
-                      <Clock className="h-4 w-4 text-emerald-600" />
-                    </div>
-                    <span className="text-sm font-medium">{item.expiry}</span>
-                  </div>
-                </div>
+            <div className="p-6">
+              <h3 className="text-xl font-bold">{item.type}</h3>
+              <p className="text-sm text-gray-500 mb-4">by {item.donor}</p>
 
-                <button className="w-full py-4 bg-emerald-600 text-white rounded-2xl font-bold hover:bg-emerald-700 transition-colors flex items-center justify-center gap-2 group-hover:gap-3">
-                  Request Food
-                  <ChevronRight className="h-5 w-5" />
-                </button>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+              <p className="text-sm">📦 {item.quantity}</p>
+              <p className="text-sm">📍 {item.location}</p>
+              <p className="text-sm mb-4">⏰ {item.expiry}</p>
 
-        {filteredListings.length === 0 && (
-          <div className="text-center py-20">
-            <div className="bg-emerald-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Info className="h-8 w-8 text-emerald-600" />
+              <button
+                onClick={() => setSelectedItem(item)}
+                className="w-full py-3 bg-emerald-600 text-white rounded-xl"
+              >
+                Request Food
+              </button>
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">No donations found</h3>
-            <p className="text-gray-500">Try adjusting your search or filters to find what you're looking for.</p>
-          </div>
-        )}
+          </motion.div>
+        ))}
       </div>
+
+      {/* Empty */}
+      {filteredListings.length === 0 && (
+        <div className="text-center mt-20">
+          <Info className="mx-auto mb-3" />
+          <p>No results found</p>
+        </div>
+      )}
+
+      {/* Modal */}
+      {selectedItem && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center">
+          <div className="bg-white p-6 rounded-2xl w-[90%] max-w-md">
+            <h2 className="text-xl font-bold mb-3">Confirm Request</h2>
+
+            <p>{selectedItem.type}</p>
+            <p>{selectedItem.quantity}</p>
+            <p>{selectedItem.location}</p>
+
+            <button
+              onClick={handleConfirmRequest}
+              className="w-full py-2 bg-emerald-600 text-white rounded mt-4"
+            >
+              Confirm
+            </button>
+
+            <button
+              onClick={() => setSelectedItem(null)}
+              className="w-full py-2 border rounded mt-2"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Popup */}
+      {showPopup && (
+        <div className="fixed top-5 right-5 bg-emerald-600 text-white px-5 py-3 rounded-lg">
+          ✅ Request Sent Successfully!
+        </div>
+      )}
+
     </div>
   );
 };
